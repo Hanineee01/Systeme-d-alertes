@@ -48,9 +48,8 @@ namespace AlertesApi.Controllers
             _context.Alertes.Add(alerte);
             await _context.SaveChangesAsync();
 
-            // === ENVOI EN TEMPS RÉEL À TOUS LES POSTES CONNECTÉS ===
-            await _hubContext.Clients.Group("Tous").SendAsync("ReceiveAlerte", alerte);
-            // ========================================================
+            // ENVOI IMMÉDIAT À TOUS LES CLIENTS CONNECTÉS
+            await _hubContext.Clients.All.SendAsync("ReceiveAlerte", alerte);
 
             return CreatedAtAction(nameof(GetAlerte), new { id = alerte.Id }, alerte);
         }
@@ -79,8 +78,8 @@ namespace AlertesApi.Controllers
                 throw;
             }
 
-            // Optionnel : envoyer aussi la mise à jour en temps réel
-            await _hubContext.Clients.Group("Tous").SendAsync("UpdateAlerte", alerte);
+            // Optionnel : mise à jour en temps réel
+            await _hubContext.Clients.All.SendAsync("ReceiveAlerte", alerte);
 
             return NoContent();
         }
@@ -97,9 +96,6 @@ namespace AlertesApi.Controllers
 
             _context.Alertes.Remove(alerte);
             await _context.SaveChangesAsync();
-
-            // Optionnel : notifier la suppression
-            await _hubContext.Clients.Group("Tous").SendAsync("DeleteAlerte", id);
 
             return NoContent();
         }
