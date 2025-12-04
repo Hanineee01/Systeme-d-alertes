@@ -12,6 +12,7 @@ namespace ClientAlertesWPF.ViewModels
     public partial class MainViewModel : ObservableObject
     {
         public RelayCommand OpenCommand { get; }
+        public RelayCommand ShowWindowCommand { get; }
         public RelayCommand ExitCommand { get; }
 
         private readonly TaskbarIcon notifyIcon;
@@ -19,6 +20,7 @@ namespace ClientAlertesWPF.ViewModels
         public MainViewModel()
         {
             OpenCommand = new RelayCommand(() => MessageBox.Show("Système d'alertes actif"));
+            ShowWindowCommand = new RelayCommand(() => MessageBox.Show("Système d'alertes actif"));
             ExitCommand = new RelayCommand(() => Application.Current.Shutdown());
 
             notifyIcon = (TaskbarIcon)Application.Current.FindResource("NotifyIcon");

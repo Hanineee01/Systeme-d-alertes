@@ -10,9 +10,10 @@
     <Grid>
         <tb:TaskbarIcon x:Name="NotifyIcon"
                         ToolTipText="Système d'alertes"
+                        DataContext="{Binding}"
                         DoubleClickCommand="{Binding ShowWindowCommand}">
             <tb:TaskbarIcon.ContextMenu>
-                <ContextMenu>
+                <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
                     <MenuItem Header="Ouvrir" Command="{Binding ShowWindowCommand}"/>
                     <MenuItem Header="Quitter" Command="{Binding ExitCommand}"/>
                 </ContextMenu>

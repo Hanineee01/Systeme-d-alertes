@@ -1,0 +1,11 @@
+{
+  "ConnectionStrings": {
+    "MariaDB": "Server=localhost;Port=3306;Database=systeme_alertes;User=SwitchC;Password=3BIoEE2O_gbbq/F!;"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}
