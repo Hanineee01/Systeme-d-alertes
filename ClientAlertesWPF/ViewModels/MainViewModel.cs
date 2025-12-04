@@ -1,79 +1,111 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Microsoft.AspNetCore.SignalR.Client;
+﻿using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Media;
+using System.Net.Http;
 using System.Windows;
-using Hardcodet.Wpf.TaskbarNotification;
-using System.Drawing;
+using Windows.Data.Xml.Dom;
+using Windows.UI.Notifications;
 
 namespace ClientAlertesWPF.ViewModels
 {
-    public partial class MainViewModel : ObservableObject
+    public class MainViewModel
     {
-        public RelayCommand OpenCommand { get; }
-        public RelayCommand ShowWindowCommand { get; }
-        public RelayCommand ExitCommand { get; }
-
-        private readonly TaskbarIcon notifyIcon;
+        private HubConnection connection;
 
         public MainViewModel()
         {
-            OpenCommand = new RelayCommand(() => MessageBox.Show("Système d'alertes actif"));
-            ShowWindowCommand = new RelayCommand(() => MessageBox.Show("Système d'alertes actif"));
-            ExitCommand = new RelayCommand(() => Application.Current.Shutdown());
-
-            notifyIcon = (TaskbarIcon)Application.Current.FindResource("NotifyIcon");
-            notifyIcon.Icon = System.Drawing.SystemIcons.Shield; // icône bleue bouclier (toujours visible)
-
-            ConnectToServer();
+            ConnectToSignalR();
         }
 
-        private async void ConnectToServer()
+        private async void ConnectToSignalR()
         {
-            var connection = new HubConnectionBuilder()
-                .WithUrl("http://localhost:5177/hubs/alertes")
+            connection = new HubConnectionBuilder()
+                .WithUrl("https://localhost:7012/hubs/alertes", options =>
+                {
+                    options.HttpMessageHandlerFactory = (_) => new HttpClientHandler
+                    {
+                        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                    };
+                })
                 .WithAutomaticReconnect()
                 .Build();
 
-            connection.On<Alerte>("ReceiveAlerte", (alerte) =>
+            connection.On<Alerte>("ReceiveAlerte", alerte =>
             {
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    // Son qui hurle à mort
-                    for (int i = 0; i < 10; i++)
-                    {
-                        SystemSounds.Hand.Play();
-                    }
-
-                    // Toast rouge si critique
-                    BalloonIcon icon = alerte.Niveau == "Critique" ? BalloonIcon.Error : BalloonIcon.Warning;
-
-                    notifyIcon.ShowBalloonTip(
-                        alerte.Titre,
-                        alerte.Message,
-                        icon);
-                });
+                Application.Current.Dispatcher.Invoke(() => ShowSwitchToast(alerte));
             });
 
             try
             {
                 await connection.StartAsync();
-                notifyIcon.ToolTipText = "Alertes · Connecté";
-                notifyIcon.ShowBalloonTip("Système d'alertes", "Connecté avec succès !", BalloonIcon.Info);
+                ShowSwitchToast(new Alerte
+                {
+                    Titre = "Système d'alertes Switch",
+                    Message = "Connecté avec succès. Le poste est prêt.",
+                    Niveau = "Info"
+                });
             }
             catch (Exception ex)
             {
-                MessageBox.Show("ERREUR CONNEXION :\n" + ex.Message);
+                MessageBox.Show("Connexion échouée : " + ex.Message);
             }
+        }
+
+        private void ShowSwitchToast(Alerte alerte)
+        {
+            string backgroundColor = alerte.Niveau switch
+            {
+                "Critique" => "#FF4B4B",
+                "Avertissement" => "#FF8C42",
+                _ => "#3777FF"
+            };
+
+            string sound = alerte.Niveau switch
+            {
+                "Critique" => "ms-winsoundevent:Notification.SMS",
+                "Avertissement" => "ms-winsoundevent:Notification.Reminder",
+                _ => "ms-winsoundevent:Notification.Mail"
+            };
+
+            string xml = $@"<?xml version='1.0'?>
+<toast duration='long' scenario='{(alerte.Niveau == "Critique" ? "alarm" : "default")}'>
+    <visual>
+        <binding template='ToastGeneric'>
+            <!-- TON LOGO SWITCH ROND -->
+            <image placement='appLogoOverride' hint-crop='circle' src='https://switchcompagnie.eu/assets/img/logo.png'/>
+            
+            <text hint-style='title' color='#4A0E80'>{alerte.Titre}</text>
+            <text hint-style='body' color='#FFFFFF'>{alerte.Message}</text>
+            <text placement='attribution' color='#FF2B80'>
+                Poste : {Environment.MachineName} • {DateTime.Now:HH:mm:ss}
+            </text>
+        </binding>
+    </visual>
+
+    <audio src='{sound}' loop='{(alerte.Niveau == "Critique" ? "true" : "false")}'/>
+
+    <actions>
+        <action content='Marquer comme lue' arguments='read:{alerte.Id}' activationType='protocol'/>
+        <action content='Fermer' arguments='close' activationType='system'/>
+    </actions>
+</toast>";
+
+            var doc = new XmlDocument();
+            doc.LoadXml(xml);
+
+            var toast = new ToastNotification(doc);
+            toast.Data = new NotificationData();
+            toast.Data.Values["backgroundColor"] = backgroundColor;
+
+            ToastNotificationManager.CreateToastNotifier("Système d'alertes Switch Compagnie").Show(toast);
         }
     }
 
     public class Alerte
     {
         public int Id { get; set; }
-        public string Titre { get; set; } = "";
-        public string Message { get; set; } = "";
+        public string Titre { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
         public string Niveau { get; set; } = "Info";
         public DateTime DateCreation { get; set; }
         public bool EstLue { get; set; }

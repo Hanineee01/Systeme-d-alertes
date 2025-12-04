@@ -9,11 +9,12 @@ namespace ClientAlertesWPF
         {
             InitializeComponent();
             DataContext = new MainViewModel();
+            this.Hide();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.Hide(); // cache la fenêtre mais garde l'icône vivante
+            this.Hide();
         }
     }
 }
