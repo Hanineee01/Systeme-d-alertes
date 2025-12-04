@@ -1,10 +1,18 @@
 {
   "ConnectionStrings": {
+<<<<<<< HEAD
     "<<<<<<<" "HEAD",
     "MariaDB": "Server=localhost;Port=3306;Database=systeme_alertes;User=SwitchC;Password=XJNfhR*)lNImY(kE;",
     "=======": null,
     "MariaDB": "Server=localhost;Port=3306;Database=systeme_alertes;User=root;Password=;",
     ">>>>>>>" "47b6c49c3a0a910821d5d1f4d3f5fcca2ac5fe95"
+=======
+<<<<<<< HEAD
+    "MariaDB": "Server=localhost;Port=3306;Database=systeme_alertes;User=SwitchC;Password=3BIoEE2O_gbbq/F!;"
+=======
+    "MariaDB": "Server=localhost;Port=3306;Database=systeme_alertes;User=your_username;Password=your_password;"
+>>>>>>> 47b6c49c3a0a910821d5d1f4d3f5fcca2ac5fe95
+>>>>>>> f5aa0efb4fe9c7fbcfad84124004d5fb6c3d638f
   },
   "Logging": {
     "LogLevel": {
