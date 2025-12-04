@@ -1,83 +1,61 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Media;
+using System.Net.Http;
 using System.Windows;
-using Hardcodet.Wpf.TaskbarNotification;
-using System.Drawing;
 
 namespace ClientAlertesWPF.ViewModels
 {
-    public partial class MainViewModel : ObservableObject
+    public class MainViewModel
     {
-        public RelayCommand OpenCommand { get; }
-        public RelayCommand ShowWindowCommand { get; }
-        public RelayCommand ExitCommand { get; }
-
-        private readonly TaskbarIcon notifyIcon;
+        private readonly TaskbarIcon tray;
 
         public MainViewModel()
         {
-            OpenCommand = new RelayCommand(() => MessageBox.Show("Système d'alertes actif"));
-            ShowWindowCommand = new RelayCommand(() => MessageBox.Show("Système d'alertes actif"));
-            ExitCommand = new RelayCommand(() => Application.Current.Shutdown());
+            tray = (TaskbarIcon)Application.Current.FindResource("MyNotifyIcon");
 
-            notifyIcon = (TaskbarIcon)Application.Current.FindResource("NotifyIcon");
-            notifyIcon.Icon = System.Drawing.SystemIcons.Shield; // icône bleue bouclier (toujours visible)
+            MessageBox.Show("CLIENT LANCÉ – ICÔNE DEVRAIT ÊTRE VISIBLE", "TEST", MessageBoxButton.OK, MessageBoxImage.Information);
 
-            ConnectToServer();
+            Connect();
         }
 
-        private async void ConnectToServer()
+        private async void Connect()
         {
-            var connection = new HubConnectionBuilder()
-                .WithUrl("http://localhost:5177/hubs/alertes")
-                .WithAutomaticReconnect()
+            var conn = new HubConnectionBuilder()
+                .WithUrl("https://localhost:7012/hubs/alertes", o =>
+                {
+                    o.HttpMessageHandlerFactory = (_) => new HttpClientHandler
+                    {
+                        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                    };
+                })
                 .Build();
 
-            connection.On<Alerte>("ReceiveAlerte", (alerte) =>
+            conn.On<string, string, string>("ReceiveAlerte", (titre, message, niveau) =>
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    // Son qui hurle à mort
-                    for (int i = 0; i < 10; i++)
+                    if (niveau == "Critique")
                     {
-                        SystemSounds.Hand.Play();
+                        for (int i = 0; i < 15; i++)
+                            SystemSounds.Hand.Play();
                     }
 
-                    // Toast rouge si critique
-                    BalloonIcon icon = alerte.Niveau == "Critique" ? BalloonIcon.Error : BalloonIcon.Warning;
-
-                    notifyIcon.ShowBalloonTip(
-                        alerte.Titre,
-                        alerte.Message,
-                        icon);
+                    tray.ShowBalloonTip(titre, message, BalloonIcon.Info);
                 });
             });
 
             try
             {
-                await connection.StartAsync();
-                notifyIcon.ToolTipText = "Alertes · Connecté";
-                notifyIcon.ShowBalloonTip("Système d'alertes", "Connecté avec succès !", BalloonIcon.Info);
+                await conn.StartAsync();
+                tray.ToolTipText = "Connecté";
+                tray.ShowBalloonTip("CONNECTÉ", "Le poste est prêt", BalloonIcon.Info);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("ERREUR CONNEXION :\n" + ex.Message);
+                MessageBox.Show("ERREUR : " + ex.Message);
             }
         }
-    }
-
-    public class Alerte
-    {
-        public int Id { get; set; }
-        public string Titre { get; set; } = "";
-        public string Message { get; set; } = "";
-        public string Niveau { get; set; } = "Info";
-        public DateTime DateCreation { get; set; }
-        public bool EstLue { get; set; }
-        public bool EstArchivee { get; set; }
-        public int? PosteIdDestinataire { get; set; }
     }
 }
