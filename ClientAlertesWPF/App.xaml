@@ -4,6 +4,6 @@
              xmlns:tb="clr-namespace:Hardcodet.Wpf.TaskbarNotification;assembly=Hardcodet.NotifyIcon.Wpf">
     <Application.Resources>
         <tb:TaskbarIcon x:Key="NotifyIcon"
-                        ToolTipText="Système d'alertes Switch" />
+                        ToolTipText="Système d'alertes Switch Compagnie" />
     </Application.Resources>
 </Application>
