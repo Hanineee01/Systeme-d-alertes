@@ -1,18 +1,36 @@
+<<<<<<< HEAD
 using Microsoft.AspNetCore.SignalR.Client;
+=======
+<<<<<<< HEAD
+﻿using Hardcodet.Wpf.TaskbarNotification;
+using Microsoft.AspNetCore.SignalR.Client;
+=======
+﻿using Microsoft.AspNetCore.SignalR.Client;
+>>>>>>> 6205666af16cf0d558b6c06f4c92f1cfa67fd098
+>>>>>>> 6076090afb5cee47de722d23dac1eacca9271f96
 using System;
 using System.Drawing;
 using System.IO;
 using System.Media;
 using System.Net.Http;
 using System.Windows;
+<<<<<<< HEAD
 using Hardcodet.Wpf.TaskbarNotification;
 using Windows.Data.Xml.Dom;
 using Windows.UI.Notifications;
+=======
+<<<<<<< HEAD
+=======
+using Windows.Data.Xml.Dom;
+using Windows.UI.Notifications;
+>>>>>>> 6205666af16cf0d558b6c06f4c92f1cfa67fd098
+>>>>>>> 6076090afb5cee47de722d23dac1eacca9271f96
 
 namespace ClientAlertesWPF.ViewModels
 {
     public class MainViewModel
     {
+<<<<<<< HEAD
         private HubConnection connection;
         private readonly TaskbarIcon trayIcon;
 
@@ -40,6 +58,32 @@ namespace ClientAlertesWPF.ViewModels
             {
                 trayIcon.Icon = System.Drawing.SystemIcons.Shield;
             }
+=======
+<<<<<<< HEAD
+        private readonly TaskbarIcon tray;
+
+        public MainViewModel()
+        {
+            tray = (TaskbarIcon)Application.Current.FindResource("MyNotifyIcon");
+
+            MessageBox.Show("CLIENT LANCÉ – ICÔNE DEVRAIT ÊTRE VISIBLE", "TEST", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            Connect();
+        }
+
+        private async void Connect()
+        {
+            var conn = new HubConnectionBuilder()
+                .WithUrl("https://localhost:7012/hubs/alertes", o =>
+                {
+                    o.HttpMessageHandlerFactory = (_) => new HttpClientHandler
+=======
+        private HubConnection connection;
+
+        public MainViewModel()
+        {
+            ConnectToSignalR();
+>>>>>>> 6076090afb5cee47de722d23dac1eacca9271f96
         }
 
         private async void ConnectToSignalR()
@@ -48,20 +92,59 @@ namespace ClientAlertesWPF.ViewModels
                 .WithUrl("https://localhost:7012/hubs/alertes", options =>
                 {
                     options.HttpMessageHandlerFactory = (_) => new HttpClientHandler
+<<<<<<< HEAD
+=======
+>>>>>>> 6205666af16cf0d558b6c06f4c92f1cfa67fd098
+>>>>>>> 6076090afb5cee47de722d23dac1eacca9271f96
                     {
                         ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
                     };
                 })
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+                .Build();
+
+            conn.On<string, string, string>("ReceiveAlerte", (titre, message, niveau) =>
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    if (niveau == "Critique")
+                    {
+                        for (int i = 0; i < 15; i++)
+                            SystemSounds.Hand.Play();
+                    }
+
+                    tray.ShowBalloonTip(titre, message, BalloonIcon.Info);
+                });
+=======
+>>>>>>> 6076090afb5cee47de722d23dac1eacca9271f96
                 .WithAutomaticReconnect()
                 .Build();
 
             connection.On<Alerte>("ReceiveAlerte", alerte =>
             {
                 Application.Current.Dispatcher.Invoke(() => ShowSwitchToast(alerte));
+<<<<<<< HEAD
+=======
+>>>>>>> 6205666af16cf0d558b6c06f4c92f1cfa67fd098
+>>>>>>> 6076090afb5cee47de722d23dac1eacca9271f96
             });
 
             try
             {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+                await conn.StartAsync();
+                tray.ToolTipText = "Connecté";
+                tray.ShowBalloonTip("CONNECTÉ", "Le poste est prêt", BalloonIcon.Info);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("ERREUR : " + ex.Message);
+=======
+>>>>>>> 6076090afb5cee47de722d23dac1eacca9271f96
                 await connection.StartAsync();
                 trayIcon.ToolTipText = "Switch Alertes · Connecté";
                 ShowSwitchToast(new Alerte { Titre = "Connecté", Message = "Le poste est prêt à recevoir les alertes.", Niveau = "Info" });
@@ -69,6 +152,10 @@ namespace ClientAlertesWPF.ViewModels
             catch (Exception ex)
             {
                 MessageBox.Show("Connexion échouée : " + ex.Message);
+<<<<<<< HEAD
+=======
+>>>>>>> 6205666af16cf0d558b6c06f4c92f1cfa67fd098
+>>>>>>> 6076090afb5cee47de722d23dac1eacca9271f96
             }
         }
 
@@ -117,6 +204,11 @@ namespace ClientAlertesWPF.ViewModels
             ToastNotificationManager.CreateToastNotifier("Système d'alertes Switch Compagnie").Show(toast);
         }
     }
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> 6076090afb5cee47de722d23dac1eacca9271f96
 
     public class Alerte
     {
@@ -129,4 +221,8 @@ namespace ClientAlertesWPF.ViewModels
         public bool EstArchivee { get; set; }
         public int? PosteIdDestinataire { get; set; }
     }
+<<<<<<< HEAD
+=======
+>>>>>>> 6205666af16cf0d558b6c06f4c92f1cfa67fd098
+>>>>>>> 6076090afb5cee47de722d23dac1eacca9271f96
 }
