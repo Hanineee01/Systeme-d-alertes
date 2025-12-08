@@ -4,6 +4,7 @@ using AlertesApi.Data;
 using AlertesApi.Models;
 using Microsoft.AspNetCore.SignalR;
 using AlertesApi.Hubs;
+using Newtonsoft.Json; // Obligatoire pour JsonConvert
 
 namespace AlertesApi.Controllers
 {
@@ -45,11 +46,22 @@ namespace AlertesApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Alerte>> PostAlerte(Alerte alerte)
         {
+            alerte.DateCreation = DateTime.UtcNow;
+            alerte.EstLue = false;
+            alerte.EstArchivee = false;
+
             _context.Alertes.Add(alerte);
             await _context.SaveChangesAsync();
 
-            // ENVOI IMMÉDIAT À TOUS LES CLIENTS CONNECTÉS
-            await _hubContext.Clients.All.SendAsync("ReceiveAlerte", alerte);
+            // === ENVOI EN TEMPS RÉEL À TOUS LES CLIENTS WPF ===
+            var alertForClient = new
+            {
+                Titre = alerte.Titre,
+                Message = alerte.Message,
+                Niveau = alerte.Niveau // "Info", "Warning" ou "Critical"
+            };
+
+            await _hubContext.Clients.All.SendAsync("ReceiveAlert", JsonConvert.SerializeObject(alertForClient));
 
             return CreatedAtAction(nameof(GetAlerte), new { id = alerte.Id }, alerte);
         }
@@ -78,8 +90,15 @@ namespace AlertesApi.Controllers
                 throw;
             }
 
-            // Optionnel : mise à jour en temps réel
-            await _hubContext.Clients.All.SendAsync("ReceiveAlerte", alerte);
+            // Envoi mise à jour en temps réel (optionnel)
+            var alertForClient = new
+            {
+                Titre = alerte.Titre,
+                Message = alerte.Message,
+                Niveau = alerte.Niveau
+            };
+
+            await _hubContext.Clients.All.SendAsync("ReceiveAlert", JsonConvert.SerializeObject(alertForClient));
 
             return NoContent();
         }
