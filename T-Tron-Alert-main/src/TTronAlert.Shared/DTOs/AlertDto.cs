@@ -9,5 +9,6 @@ public record AlertDto(
     AlertLevel Level,
     DateTime CreatedAt,
     bool IsRead,
-    bool IsArchived
+    bool IsArchived,
+    string? TargetWorkstationId  // Correction : string? au lieu de int?
 );

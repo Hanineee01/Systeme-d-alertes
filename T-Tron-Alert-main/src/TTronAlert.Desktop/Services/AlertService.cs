@@ -8,6 +8,9 @@ namespace TTronAlert.Desktop.Services;
 public class AlertService : IAlertService
 {
     private readonly HubConnection _connection;
+    private readonly string _workstationId = "poste-1";  // ID fixe (change-le pour ton poste, ex. "poste-2")
+
+    public string WorkstationId => _workstationId;  // Propriété publique pour accéder à l'ID
 
     public event EventHandler<AlertDto>? AlertReceived;
 
@@ -16,7 +19,7 @@ public class AlertService : IAlertService
     public AlertService()
     {
         _connection = new HubConnectionBuilder()
-            .WithUrl("http://localhost:5177/hubs/alerts")
+            .WithUrl($"http://localhost:62051/alerthub?workstationId={_workstationId}")
             .WithAutomaticReconnect()
             .Build();
 

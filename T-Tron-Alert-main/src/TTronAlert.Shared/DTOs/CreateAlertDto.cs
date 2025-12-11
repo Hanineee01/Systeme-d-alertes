@@ -13,5 +13,8 @@ public record CreateAlertDto(
     string Message,
 
     [Required(ErrorMessage = "Le niveau d'alerte est requis")]
-    AlertLevel Level
+    AlertLevel Level,
+
+    [StringLength(100, ErrorMessage = "L'ID du poste cible doit contenir au maximum 100 caractères")]
+    string? TargetWorkstationId = null
 );

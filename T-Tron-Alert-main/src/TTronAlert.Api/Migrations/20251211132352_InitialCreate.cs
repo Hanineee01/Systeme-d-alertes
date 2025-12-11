@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -28,7 +28,9 @@ namespace TTronAlert.Api.Migrations
                     Level = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     IsRead = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    IsArchived = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                    IsArchived = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    TargetWorkstationId = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {

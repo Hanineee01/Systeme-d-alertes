@@ -39,7 +39,8 @@ public class AlertService : IAlertService
             Level = dto.Level,
             CreatedAt = DateTime.UtcNow,
             IsRead = false,
-            IsArchived = false
+            IsArchived = false,
+            TargetWorkstationId = dto.TargetWorkstationId  // Ligne 43 : Types matchent maintenant (string? = string?)
         };
 
         _context.Alerts.Add(alert);

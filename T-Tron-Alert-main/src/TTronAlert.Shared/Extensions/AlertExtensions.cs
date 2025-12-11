@@ -17,7 +17,8 @@ public static class AlertExtensions
             alert.Level,
             alert.CreatedAt,
             alert.IsRead,
-            alert.IsArchived
+            alert.IsArchived,
+            alert.TargetWorkstationId  // string?
         );
     }
 

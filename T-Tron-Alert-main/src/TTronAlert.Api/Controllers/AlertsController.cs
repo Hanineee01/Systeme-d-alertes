@@ -43,7 +43,14 @@ public class AlertsController : ControllerBase
         var alert = await _alertService.CreateAsync(dto);
         var alertDto = alert.ToDto();
 
-        await _hubContext.Clients.Group("AllWorkstations").SendAsync("ReceiveAlert", alertDto);
+        if (string.IsNullOrEmpty(alert.TargetWorkstationId))
+        {
+            await _hubContext.Clients.Group("AllWorkstations").SendAsync("ReceiveAlert", alertDto);
+        }
+        else
+        {
+            await _hubContext.Clients.Group($"Workstation_{alert.TargetWorkstationId}").SendAsync("ReceiveAlert", alertDto);
+        }
 
         return CreatedAtAction(nameof(GetById), new { id = alert.Id }, alertDto);
     }

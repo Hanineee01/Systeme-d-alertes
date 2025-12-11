@@ -1,5 +1,5 @@
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;  // Ajout pour ObservableCollection
 using Avalonia.Threading;
 using ReactiveUI;
 using TTronAlert.Desktop.Services;
@@ -15,6 +15,7 @@ public class MainWindowViewModel : ViewModelBase, IDisposable
     private string _connectionStatus = "Disconnected";
     private bool _isDarkTheme;
     private bool _disposed;
+    private string _workstationId = string.Empty;  // Initialisé pour éviter avertissements null
 
     public ObservableCollection<AlertItemViewModel> Alerts { get; } = new();
 
@@ -38,26 +39,37 @@ public class MainWindowViewModel : ViewModelBase, IDisposable
         }
     }
 
+    public string WorkstationId
+    {
+        get => _workstationId;
+        set => this.RaiseAndSetIfChanged(ref _workstationId, value);
+    }
+
     public MainWindowViewModel(IAlertService alertService, IToastNotificationService toastService)
     {
         _alertService = alertService;
         _toastService = toastService;
         _alertService.AlertReceived += OnAlertReceived;
-        
+
+        // Initialisation de l'ID du poste
+        WorkstationId = ((AlertService)_alertService).WorkstationId;
+
+        Dispatcher.UIThread.Post(async () => await _alertService.StartAsync());
+
         _connectionStatusTimer = new System.Timers.Timer(2000);
         _connectionStatusTimer.Elapsed += (s, e) => UpdateConnectionStatus();
         _connectionStatusTimer.Start();
-        
+
         UpdateConnectionStatus();
     }
 
     private void OnAlertReceived(object? sender, AlertDto alert)
     {
+        Console.WriteLine($"Alert received: {alert.Title}");
         Dispatcher.UIThread.Post(() =>
         {
             var alertViewModel = new AlertItemViewModel(alert);
             Alerts.Insert(0, alertViewModel);
-
             _toastService.ShowToast(alert);
         });
     }

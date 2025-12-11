@@ -2,7 +2,7 @@
 using System;
 using System.Globalization;
 
-namespace TonProjet.Converters // Remplace TonProjet par ton namespace
+namespace TTronAlert.Desktop.Converters  // Namespace corrigé sans placeholders ou dots invalides
 {
     public class TextTransformConverter : IValueConverter
     {
