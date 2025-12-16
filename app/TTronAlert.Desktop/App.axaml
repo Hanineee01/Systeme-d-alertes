@@ -11,7 +11,7 @@
 				<Setter.Value>
 					<LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
 						<GradientStop Color="#3777FF" Offset="0" />
-						<GradientStop Color="#0044CC" Offset="1" />
+						<GradientStop Color="#FFFFFF" Offset="1" />
 						<!-- Variante plus foncée pour le dégradé -->
 					</LinearGradientBrush>
 				</Setter.Value>
@@ -41,7 +41,7 @@
 		</Style>
 		<!-- Pour le texte blanc sur les bordures colorées -->
 		<Style Selector="Border.info TextBlock, Border.warning TextBlock, Border.critical TextBlock">
-			<Setter Property="Foreground" Value="#FFFFFF" />
+			<Setter Property="Foreground" Value="#000000" />
 		</Style>
 	</Application.Styles>
 </Application>

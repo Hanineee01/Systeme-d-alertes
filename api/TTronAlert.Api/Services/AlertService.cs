@@ -72,7 +72,7 @@ public class AlertService : IAlertService
         await _context.SaveChangesAsync();
         return alert;
     }
-
+    
     public async Task<bool> DeleteAsync(int id)
     {
         var alert = await _context.Alerts.FindAsync(id);

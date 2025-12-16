@@ -52,12 +52,12 @@
                        MaxHeight="60"/>
             
             <!-- TimeAgo en haut à droite -->
-            <Border Grid.Column="2" Grid.Row="0"
+            <Border Grid.Column="2" Grid.Row="1"
                     Background="#000000"
                     BorderBrush="#4A0E80"
                     BorderThickness="1"
                     CornerRadius="6"
-                    Padding="8"
+                    Padding="12"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top">
                 <TextBlock Text="{Binding TimeAgo}" FontSize="12" FontFamily="Arial" Foreground="#FFFFFF"/>
@@ -74,23 +74,25 @@
                     Padding="8"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Bottom">
-                <TextBlock Text="{Binding LevelText}" FontSize="12" FontFamily="Arial" Foreground="#FFFFFF"/>
+                <TextBlock Text="{Binding LevelText}" FontSize="12" FontFamily="Arial" Foreground="#000000"/>
             </Border>
             
-            <!-- Bouton de fermeture '✖' dans le coin supérieur droit -->
+            <!-- Bouton de fermeture '✖' dans le coin supérieur droit, avec fond légèrement contrasté (gris foncé #333333) -->
             <Button Grid.Column="2" Grid.Row="0"
-                    Content="✖"
-                    Width="20"
-                    Height="20"
+                    Content="x"
+                    Width="25"
+                    Height="25"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top"
-                    Margin="0, -10, -10, 0"
-                    Background="#000000"
-                    BorderThickness="0"
-                    FontSize="14"
+                    Margin="0, -12, -12, 0"
+                    Background="#333333"
+                    BorderBrush="#333333"
+                    BorderThickness="1"
+                    CornerRadius="40"
+                    FontSize="10"
                     FontWeight="Bold"
                     FontFamily="Arial"
-                    Foreground="#FF2B80"
+                    Foreground="#FFFFFF"
                     Click="CloseButton_Click"/>
         </Grid>
     </Border>
